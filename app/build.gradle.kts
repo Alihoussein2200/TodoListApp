@@ -3,6 +3,8 @@ plugins {
     id("org.jetbrains.kotlin.android")
     id("kotlin-android")
     id("kotlin-kapt")
+    id("com.google.gms.google-services")
+
 }
 
 android {
@@ -99,10 +101,11 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
-    androidTestImplementation(platform("androidx.compose:compose-bom:2023.10.01"))
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.5.4")
 
-    // Debugging
-    debugImplementation("androidx.compose.ui:ui-tooling:1.5.4")
+
+    // UI
+    implementation("androidx.compose.ui:ui-tooling:1.5.4")
     debugImplementation("androidx.compose.ui:ui-test-manifest:1.5.4")
+    implementation (platform("androidx.compose:compose-bom:2023.10.01"))
+    implementation("androidx.compose.ui:ui-test-junit4:1.5.4")
 }
