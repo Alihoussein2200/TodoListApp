@@ -1,25 +1,44 @@
 package com.example.todolistapp.viewmodel
 
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Transformations
+import androidx.lifecycle.ViewModel
 import com.example.todolistapp.data.TodoEntity
 import com.example.todolistapp.repository.TodoRepository
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class TodoViewModel @Inject constructor(private val repository: TodoRepository) : ViewModel() {
-    val allTodos: LiveData<List<TodoEntity>> = repository.getAllTodos
 
-    fun update(todo: TodoEntity) {
-        viewModelScope.launch {
-            repository.update(todo)
+class TodoViewModel(private val repository: TodoRepository) : ViewModel() {
+    val allTodos = repository.allTodos
+
+    // For searching
+    private val _searchQuery = MutableLiveData("")
+
+    // For filtering
+    val filteredTodos: LiveData<List<TodoEntity>> = Transformations.switchMap(_searchQuery) { query ->
+        if (query.isEmpty()) {
+            _allTodos
+        } else {
+            Transformations.map(_allTodos) { todos ->
+                todos.filter { it.title.contains(query, ignoreCase = true) }
+            }
         }
     }
 
-    fun insert(todo: TodoEntity) {
-        viewModelScope.launch {
-            repository.insert(todo)
-        }
+    fun setSearchQuery(query: String) {
+        _searchQuery.value = query
+    }
+
+    fun insert(todo: TodoEntity) = viewModelScope.launch {
+        repository.insert(todo)
+    }
+
+    fun update(todo: TodoEntity) = viewModelScope.launch {
+        repository.update(todo)
+    }
+
+    fun delete(todo: TodoEntity) = viewModelScope.launch {
+        repository.delete(todo)
     }
 }

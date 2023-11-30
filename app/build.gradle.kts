@@ -4,7 +4,8 @@ plugins {
     id("kotlin-android")
     id("kotlin-kapt")
     id("com.google.gms.google-services")
-    id("com.google.dagger.hilt.android")
+
+    //id("com.google.dagger.hilt.android")
 
 }
 
@@ -52,11 +53,6 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
-    buildToolsVersion = "34.0.0"
-    dependenciesInfo {
-        includeInApk = false
-        includeInBundle = false
-    }
 }
 
 dependencies {
@@ -72,8 +68,8 @@ dependencies {
     implementation("androidx.compose.material3:material3: 1.1.2")
     implementation("androidx.compose.material3:material3-window-size-class:1.1.2")
     implementation("androidx.compose.runtime:runtime:1.5.4")
-    implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
-    implementation ("androidx.compose.runtime:runtime-livedata:1.5.4")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
+    implementation("androidx.compose.runtime:runtime-livedata:1.5.4")
     implementation("androidx.compose.foundation:foundation-android:1.5.4")
     //implementation ("androidx.compose.material:material")
 
@@ -103,25 +99,34 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
 
     // Retrofit for network requests (Giphy API)
-    implementation("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    //implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    //implementation("com.squareup.retrofit2:converter-gson:2.9.0")
 
     // Giphy API integration (if we use the official SDK)
     //implementation("com.giphy.sdk:ui:2.1.0")
 
     //Hilt
-    implementation("com.google.dagger:hilt-android:2.48.1")
-    kapt("com.google.dagger:hilt-android-compiler:2.48.1")
+    //implementation("com.google.dagger:hilt-android:2.48.1")
+    //kapt("com.google.dagger:hilt-android-compiler:2.48.1")
+    // implementation ("androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha03")
+    // kapt ("androidx.hilt:hilt-compiler:1.1.0")
+    // implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
 
-    implementation ("androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha03")
-    kapt ("androidx.hilt:hilt-compiler:1.1.0")
-    implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
+    //Koin
+    implementation("io.insert-koin:koin-android:3.5.2-RC1")
+    implementation ("io.insert-koin:koin-androidx-compose:3.5.2-RC1")
+    // Java Compatibility
+    implementation ("io.insert-koin:koin-android-compat:3.5.2-RC1")
+    // Jetpack WorkManager
+    implementation ("io.insert-koin:koin-androidx-workmanager:3.5.2-RC1")
+    // Navigation Graph
+    implementation ("io.insert-koin:koin-androidx-navigation:3.5.2-RC1")
 
 
 }
 kapt {
     correctErrorTypes = true
 }
-hilt {
-    enableAggregatingTask = true
-}
+//hilt {
+  //  enableAggregatingTask = true
+//}
