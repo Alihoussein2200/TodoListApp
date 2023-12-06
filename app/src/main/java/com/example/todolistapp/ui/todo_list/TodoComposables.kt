@@ -4,9 +4,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.material3.OutlinedTextField // Correct import for OutlinedTextField
-import androidx.compose.material3.Text // Correct import for Text
-import androidx.compose.material3.Checkbox // Correct import for Checkbox
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.Checkbox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -14,17 +15,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.example.todolistapp.data.TodoEntity
-import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.ui.res.painterResource
+
 
 @Composable
 fun TodoList(todos: List<TodoEntity>, onTodoCheckedChange: (TodoEntity) -> Unit, onTodoClick: (TodoEntity) -> Unit) {
@@ -49,7 +54,7 @@ fun TodoItem(todo: TodoEntity, onTodoCheckedChange: (TodoEntity) -> Unit, onTodo
         modifier = Modifier
             .fillMaxWidth()
             .padding(4.dp),
-        elevation = 2.dp
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp) // Using CardDefaults for elevation
     ) {
         Row(
             modifier = Modifier
@@ -77,28 +82,75 @@ fun TodoItem(todo: TodoEntity, onTodoCheckedChange: (TodoEntity) -> Unit, onTodo
 
 @Composable
 fun TodoInputField(onTodoAdd: (String) -> Unit) {
-    val (text, setText) = remember { mutableStateOf("") }
+    var text by remember { mutableStateOf("") }
     val keyboardController = LocalSoftwareKeyboardController.current
 
     OutlinedTextField(
         value = text,
-        onValueChange = setText,
-        label = { Text("Add a task") },
+        onValueChange = { newText -> text = newText },
+        label = { Text("Add a task", style = MaterialTheme.typography.bodyMedium) },
+        placeholder = { Text("Enter todo item", style = MaterialTheme.typography.bodySmall) },
         singleLine = true,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedBorderColor = MaterialTheme.colorScheme.primary,
+            unfocusedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
+            cursorColor = MaterialTheme.colorScheme.primary
+        ),
+        keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
         keyboardActions = KeyboardActions(
             onDone = {
-                onTodoAdd(text)
-                setText("")
-                keyboardController?.hide()
+                if (text.isNotBlank()) {
+                    onTodoAdd(text)
+                    text = "" // Clear the text field
+                    keyboardController?.hide() // Hide the keyboard
+                }
             }
         ),
-        colors = TextFieldDefaults.outlinedTextFieldColors(
-            focusedBorderColor = Color.Blue,
-            unfocusedBorderColor = Color.LightGray
-        ),
-        imeAction = ImeAction.Done
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp)
     )
+}
+@Composable
+fun TodoInputFieldWithGiphy(
+    onTodoAdd: (String, String?) -> Unit,
+    onGiphyClick: () -> Unit
+) {
+    var text by remember { mutableStateOf("") }
+    var selectedGifId by remember { mutableStateOf<String?>(null) }
+
+    Column {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp), // Add padding to separate items from screen edges
+            verticalAlignment = Alignment.CenterVertically // Vertically align the components in the Row
+        ) {
+            // Give the TextField a weight so it fills the space left by the IconButton
+            TextField(
+                value = text,
+                onValueChange = { text = it },
+                label = { Text("Add a task") },
+                modifier = Modifier.weight(1f) // TextField will fill the remaining space
+            )
+            IconButton(onClick = onGiphyClick) {
+                Icon(painter = painterResource(id = com.giphy.sdk.ui.R.drawable.gph_ic_gif), contentDescription = "Giphy")
+            }
+        }
+
+        // Button is now within the Column, so it naturally falls below the Row
+        Button(
+            onClick = {
+                if (text.isNotBlank()) {
+                    onTodoAdd(text, selectedGifId)
+                    text = "" // Reset the text field
+                    selectedGifId = null // Reset the selected GIF ID
+                }
+            },
+            modifier = Modifier
+                .padding(8.dp) // Add padding for spacing
+        ) {
+            Text("Add")
+        }
+    }
 }

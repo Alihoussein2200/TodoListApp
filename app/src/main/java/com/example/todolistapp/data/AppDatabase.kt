@@ -19,7 +19,9 @@ abstract class AppDatabase : RoomDatabase() {
                     context.applicationContext,
                     AppDatabase::class.java,
                     "todo_database"
-                ).build()
+                )
+                    .fallbackToDestructiveMigration() // This will recreate the database if no migration object is found.
+                    .build()
                 INSTANCE = instance
                 instance
             }

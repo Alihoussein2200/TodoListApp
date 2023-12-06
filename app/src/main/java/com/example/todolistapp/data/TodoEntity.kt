@@ -9,6 +9,7 @@ data class TodoEntity(
     val title: String,
     val description: String? = null,
     val completed: Boolean = false,
-    val deadline: Long? = null // Consider storing dates as Long (timestamps)
+    val timestamp: Long = System.currentTimeMillis(), // Added field for timestamp
+    val gifId: String? = null
 )
 
