@@ -3,154 +3,107 @@ package com.example.todolistapp.ui.todo_list
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
-import androidx.compose.material3.Checkbox
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.example.todolistapp.data.TodoEntity
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.TextField
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.ui.res.painterResource
+
 
 
 @Composable
-fun TodoList(todos: List<TodoEntity>, onTodoCheckedChange: (TodoEntity) -> Unit, onTodoClick: (TodoEntity) -> Unit) {
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(all = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(4.dp)
-    ) {
-        items(todos) { todo ->
-            TodoItem(
-                todo = todo,
-                onTodoCheckedChange = onTodoCheckedChange,
-                onTodoClick = onTodoClick
-            )
-        }
-    }
-}
-
-@Composable
-fun TodoItem(todo: TodoEntity, onTodoCheckedChange: (TodoEntity) -> Unit, onTodoClick: (TodoEntity) -> Unit) {
+fun TodoItem(todo: TodoEntity, onEdit: (TodoEntity) -> Unit, onDelete: (TodoEntity) -> Unit, onGiphySelect: () -> Unit) {
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(4.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp) // Using CardDefaults for elevation
+        backgroundColor = if (todo.completed) Color.LightGray else Color.White,
+        modifier = Modifier.fillMaxWidth().padding(8.dp)
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Checkbox(
-                checked = todo.completed,
-                onCheckedChange = { isChecked ->
-                    onTodoCheckedChange(todo.copy(completed = isChecked))
-                }
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                text = todo.title,
-                modifier = Modifier.weight(1f)
-            )
-            IconButton(onClick = { onTodoClick(todo) }) {
-                Icon(Icons.Default.Delete, contentDescription = "Delete")
-            }
+        Column(modifier = Modifier.padding(8.dp)) {
+            Text(text = "Title: ${todo.title}", style = MaterialTheme.typography.h6)
+            Text(text = "Description: ${todo.description}", style = MaterialTheme.typography.body1)
+            Text(text = "Status: ${if (todo.completed) "Completed" else "Incomplete"}", style = MaterialTheme.typography.body2)
+            Text(text = "Tags: ${todo.tags}", style = MaterialTheme.typography.body2)
+            // Display the GIF using the GIF ID - Placeholder for actual implementation
+            Button(onClick = { onEdit(todo) }) { Text("Edit") }
+            Button(onClick = { onDelete(todo) }) { Text("Delete") }
+            Button(onClick = { onGiphySelect() }) { Text("Select GIF") }
         }
     }
 }
 
 @Composable
-fun TodoInputField(onTodoAdd: (String) -> Unit) {
+fun SearchBar(onSearch: (String) -> Unit) {
     var text by remember { mutableStateOf("") }
-    val keyboardController = LocalSoftwareKeyboardController.current
 
     OutlinedTextField(
         value = text,
-        onValueChange = { newText -> text = newText },
-        label = { Text("Add a task", style = MaterialTheme.typography.bodyMedium) },
-        placeholder = { Text("Enter todo item", style = MaterialTheme.typography.bodySmall) },
-        singleLine = true,
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = MaterialTheme.colorScheme.primary,
-            unfocusedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
-            cursorColor = MaterialTheme.colorScheme.primary
-        ),
+        onValueChange = { text = it },
+        label = { Text("Search Todos") },
         keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
-        keyboardActions = KeyboardActions(
-            onDone = {
-                if (text.isNotBlank()) {
-                    onTodoAdd(text)
-                    text = "" // Clear the text field
-                    keyboardController?.hide() // Hide the keyboard
-                }
-            }
-        ),
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
-    )
-}
-@Composable
-fun TodoInputFieldWithGiphy(
-    onTodoAdd: (String, String?) -> Unit,
-    onGiphyClick: () -> Unit
-) {
-    var text by remember { mutableStateOf("") }
-    var selectedGifId by remember { mutableStateOf<String?>(null) }
-
-    Column {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp), // Add padding to separate items from screen edges
-            verticalAlignment = Alignment.CenterVertically // Vertically align the components in the Row
-        ) {
-            // Give the TextField a weight so it fills the space left by the IconButton
-            TextField(
-                value = text,
-                onValueChange = { text = it },
-                label = { Text("Add a task") },
-                modifier = Modifier.weight(1f) // TextField will fill the remaining space
-            )
-            IconButton(onClick = onGiphyClick) {
-                Icon(painter = painterResource(id = com.giphy.sdk.ui.R.drawable.gph_ic_gif), contentDescription = "Giphy")
+        modifier = Modifier.fillMaxWidth().padding(8.dp),
+        trailingIcon = {
+            IconButton(onClick = { onSearch(text) }) {
+                Icon(Icons.Filled.Search, contentDescription = "Search")
             }
         }
+    )
+}
 
-        // Button is now within the Column, so it naturally falls below the Row
-        Button(
-            onClick = {
-                if (text.isNotBlank()) {
-                    onTodoAdd(text, selectedGifId)
-                    text = "" // Reset the text field
-                    selectedGifId = null // Reset the selected GIF ID
-                }
-            },
-            modifier = Modifier
-                .padding(8.dp) // Add padding for spacing
+@Composable
+fun Filters(onFilterStatus: (Boolean?) -> Unit, onFilterTag: (String?) -> Unit) {
+    Column(modifier = Modifier.padding(8.dp)) {
+        Text("Filter by:", style = MaterialTheme.typography.subtitle1)
+
+        // Filter by Completion Status
+        var selectedStatus by remember { mutableStateOf<Boolean?>(null) }
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            RadioButton(selected = selectedStatus == true, onClick = { selectedStatus = true })
+            Text("Completed", style = MaterialTheme.typography.body1)
+            Spacer(modifier = Modifier.width(8.dp))
+            RadioButton(selected = selectedStatus == false, onClick = { selectedStatus = false })
+            Text("Incomplete", style = MaterialTheme.typography.body1)
+        }
+        Button(onClick = { onFilterStatus(selectedStatus) }) {
+            Text("Apply Status Filter")
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Filter by Tags
+        var tagText by remember { mutableStateOf("") }
+        OutlinedTextField(
+            value = tagText,
+            onValueChange = { tagText = it },
+            label = { Text("Filter by Tag") },
+            modifier = Modifier.fillMaxWidth()
+        )
+        Button(onClick = { onFilterTag(tagText) }) {
+            Text("Apply Tag Filter")
+        }
+    }
+}
+
+@Composable
+fun GiphyPicker(onGifSelected: (String) -> Unit) {
+    // Detailed implementation of Giphy picker
+    // actual logic for selecting a GIF from Giphy API
+    // For example, a dialog with a list of GIFs to choose from
+}
+
+@Composable
+fun ErrorMessage(message: String, onDismiss: () -> Unit) {
+    if (message.isNotEmpty()) {
+        Snackbar(
+            action = {
+                Button(onClick = onDismiss) { Text("Dismiss") }
+            }
         ) {
-            Text("Add")
+            Text(text = message)
         }
     }
 }

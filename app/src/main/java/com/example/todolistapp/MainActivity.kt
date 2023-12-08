@@ -13,9 +13,9 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            TodoScreen { onGifSelected ->
-                showGiphyPicker(onGifSelected)
-            }
+            TodoScreen () //{ onGifSelected ->
+               // showGiphyPicker(onGifSelected)
+            //}
         }
     }
 

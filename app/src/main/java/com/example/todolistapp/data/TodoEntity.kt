@@ -5,11 +5,13 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "todos")
 data class TodoEntity(
-    @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    @PrimaryKey(autoGenerate = true)
+    val id: Int = 0,
     val title: String,
     val description: String? = null,
     val completed: Boolean = false,
-    val timestamp: Long = System.currentTimeMillis(), // Added field for timestamp
-    val gifId: String? = null
+    val timestamp: Long = System.currentTimeMillis(),
+    val gifId: String? = null,
+    val tags: String? = null // A comma-separated list of tags
 )
 

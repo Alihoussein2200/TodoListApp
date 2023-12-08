@@ -75,6 +75,7 @@ dependencies {
     implementation ("androidx.appcompat:appcompat:1.6.1")
     implementation ("androidx.compose.material:material")
     implementation("com.google.android.engage:engage-core:1.3.1")
+    implementation("androidx.room:room-testing:2.6.1")
 
 
     testImplementation("junit:junit:4.13.2")
